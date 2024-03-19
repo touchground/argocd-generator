@@ -1,0 +1,43 @@
+name: 'Generate ArgoCD Application'
+description: 'Generates an ArgoCD application YAML file'
+inputs:
+  appName:
+    description: 'Application name'
+    required: true
+  repoUrl:
+    description: 'Repository URL'
+    required: true
+  manifestsPath:
+    description: 'Path to Kubernetes manifests in the repository'
+    required: true
+  namespace:
+    description: 'Destination namespace'
+    required: true
+  syncPolicy:
+    description: 'Sync policy'
+    required: false
+    default: 'automated'
+  outputPath:
+    description: 'Path to save the generated YAML file'
+    required: false
+    default: '.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install ArgoCD CLI
+      uses: touchground/devops-tools@release
+      with:
+        argocd: '2.10.4'
+
+    - name: Generate ArgoCD Application
+      run: |
+        argocd app create ${{ inputs.appName }} \
+          --repo ${{ inputs.repoUrl }} \
+          --path ${{ inputs.manifestsPath }} \
+          --dest-server https://kubernetes.default.svc \
+          --dest-namespace ${{ inputs.namespace }} \
+          --project default \
+          --sync-policy ${{ inputs.syncPolicy }} \
+          --upsert \
+          --dry-run > ${{ outputPath }}/${{ inputs.appName }}.yaml
+      shell: bash
