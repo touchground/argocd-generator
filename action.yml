@@ -24,20 +24,45 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Install ArgoCD CLI
-      uses: touchground/devops-tools@release
-      with:
-        argocd: '2.10.4'
+    # - name: Install ArgoCD CLI
+    #   uses: touchground/devops-tools@release
+    #   with:
+    #     argocd: '2.10.4'
+
+    # - name: Generate ArgoCD Application
+    #   run: |
+    #     argocd app create ${{ inputs.appName }} \
+    #       --repo ${{ inputs.repoUrl }} \
+    #       --path ${{ inputs.manifestsPath }} \
+    #       --dest-server https://kubernetes.default.svc \
+    #       --dest-namespace ${{ inputs.namespace }} \
+    #       --project default \
+    #       --sync-policy ${{ inputs.syncPolicy }} \
+    #       --upsert \
+    #       --dry-run > ${{ inputs.outputPath }}/${{ inputs.appName }}.yaml
+    #   shell: bash
 
     - name: Generate ArgoCD Application
       run: |
-        argocd app create ${{ inputs.appName }} \
-          --repo ${{ inputs.repoUrl }} \
-          --path ${{ inputs.manifestsPath }} \
-          --dest-server https://kubernetes.default.svc \
-          --dest-namespace ${{ inputs.namespace }} \
-          --project default \
-          --sync-policy ${{ inputs.syncPolicy }} \
-          --upsert \
-          --dry-run > ${{ outputPath }}/${{ inputs.appName }}.yaml
+        template='
+        apiVersion: argoproj.io/v1alpha1
+        kind: Application
+        metadata:
+          name: ${{ inputs.appName }}
+          namespace: argocd
+          finalizers:
+          - resources-finalizer.argocd.argoproj.io
+        spec:
+          project: default
+          source:
+            repoURL: {{ .Values.spec.source.repoURL }}
+            targetRevision: {{ .Values.spec.source.targetRevision }}
+            path: ${{ inputs.manifestsPath }}
+          destination:
+            server: {{ .Values.spec.destination.server }}
+            namespace: ${{ inputs.namespace }}
+          syncPolicy:
+            automated: {}
+        '
+        echo "${template}" > ${{ inputs.outputPath }}/${{ inputs.appName }}.yaml
       shell: bash

@@ -15,4 +15,5 @@ test:
         namespace: 'default'
         syncPolicy: 'automated'
         outputPath: '.'
+        
 ```
