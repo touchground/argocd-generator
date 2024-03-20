@@ -33,13 +33,18 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Set Application Name
+      id: setAppName
+      run: |
+        echo "appName=${{ env.envPrefix == 'true' && (inputs.env + '-') || '' }}${{ inputs.appName }}" >> $GITHUB_OUTPUT"
+
     - name: Generate ArgoCD Application
       run: |
         template='
         apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
-          name: ${{ env.envPrefix == 'true' && (inputs.env + '-') || '' }}${{ inputs.appName }}
+          name: ${{ steps.setAppName.outputs.appName }}
           namespace: argocd
           finalizers:
           - resources-finalizer.argocd.argoproj.io
