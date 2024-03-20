@@ -36,7 +36,7 @@ runs:
     - name: Set Application Name
       id: setAppName
       run: |
-        if [[ "${{ env.envPrefix }}" == "true" ]]; then
+        if [[ "${{ input.envPrefix }}" == "true" ]]; then
             appName="${{ inputs.env }}-"
         else
             appName=""
