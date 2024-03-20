@@ -36,7 +36,12 @@ runs:
     - name: Set Application Name
       id: setAppName
       run: |
-        appName=${{ env.envPrefix == 'true' && (inputs.env + '-') || '' }}${{ inputs.appName }}
+        if [[ "${{ env.envPrefix }}" == "true" ]]; then
+            appName="${{ inputs.env }}-"
+        else
+            appName=""
+        fi
+        appName+="${{ inputs.appName }}"
         echo "name=$appName" >> $GITHUB_OUTPUT"
 
     - name: Generate ArgoCD Application
