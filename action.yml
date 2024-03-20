@@ -42,7 +42,7 @@ runs:
             appName=""
         fi
         appName+="${{ inputs.appName }}"
-        echo "name=$appName" >> $GITHUB_OUTPUT"
+        echo "name=$appName" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Generate ArgoCD Application
