@@ -24,24 +24,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    # - name: Install ArgoCD CLI
-    #   uses: touchground/devops-tools@release
-    #   with:
-    #     argocd: '2.10.4'
-
-    # - name: Generate ArgoCD Application
-    #   run: |
-    #     argocd app create ${{ inputs.appName }} \
-    #       --repo ${{ inputs.repoUrl }} \
-    #       --path ${{ inputs.manifestsPath }} \
-    #       --dest-server https://kubernetes.default.svc \
-    #       --dest-namespace ${{ inputs.namespace }} \
-    #       --project default \
-    #       --sync-policy ${{ inputs.syncPolicy }} \
-    #       --upsert \
-    #       --dry-run > ${{ inputs.outputPath }}/${{ inputs.appName }}.yaml
-    #   shell: bash
-
     - name: Generate ArgoCD Application
       run: |
         template='
