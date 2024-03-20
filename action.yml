@@ -17,7 +17,7 @@ inputs:
     description: 'Sync policy'
     required: false
     default: 'automated'
-  outputPath:
+  templatePath:
     description: 'Path to save the generated YAML file'
     required: false
     default: '.'
@@ -64,5 +64,5 @@ runs:
           syncPolicy:
             automated: {}
         '
-        echo "${template}" > ${{ inputs.outputPath }}/${{ inputs.appName }}.yaml
+        echo "${template}" > ${{ inputs.templatePath }}/${{ inputs.appName }}.yaml
       shell: bash
