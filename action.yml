@@ -48,12 +48,24 @@ runs:
     - name: Set Application Name
       id: setAppName
       run: |
+        # Initialize the application name
+        appName=""
+
+        # If envPrefix is set to true, prepend the environment name to the application name
         if [[ "${{ inputs.envPrefix }}" == "true" ]]; then
+          # Check if environment name is not empty
+          if [[ -n "${{ inputs.env }}" ]]; then
             appName="${{ inputs.env }}-"
-        else
-            appName=""
+          else
+            echo "Error: Environment name is required when envPrefix is set to true"
+            exit 1
+          fi
         fi
+
+        # Append the application name
         appName+="${{ inputs.appName }}"
+
+        # Output the application name
         echo "name=$appName" >> $GITHUB_OUTPUT
       shell: bash
 
