@@ -48,31 +48,18 @@ runs:
     - name: Set Application Name
       id: setAppName
       run: |
-        # Initialize the application name
-        appName=""
-
-        # If envPrefix is set to true, prepend the environment name to the application name
         if [[ "${{ inputs.envPrefix }}" == "true" ]]; then
-          # Check if environment name is not empty
-          if [[ -n "${{ inputs.env }}" ]]; then
             appName="${{ inputs.env }}-"
-          else
-            echo "Error: Environment name is required when envPrefix is set to true"
-            exit 1
-          fi
+        else
+            appName=""
         fi
-
-        # Append the application name
-        appName+="${{ inputs.namespace }}-${{ inputs.appName }}"
-
-        # Output the application name
+        appName+="${{ inputs.appName }}"
         echo "name=$appName" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Generate ArgoCD Application
       run: |
-        # Read the template into a variable
-        read -r -d '' template << EOM
+        template='
         apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
@@ -89,27 +76,14 @@ runs:
           destination:
             server: {{ .Values.spec.destination.server }}
             namespace: ${{ inputs.namespace }}
-          syncPolicy:
-        EOM
+          syncPolicy:'
 
         # Check if automated is set to true
-        if [[ "${{ inputs.automated }}" == "true" ]]; then
-          template+="\n    automated: \n      prune: \${{ inputs.autoPrune }}\n      selfHeal: \${{ inputs.selfHeal }}"
-        else
+        if [[ "${{ inputs.automated }}" == "false" ]]; then
           template+="\n    automated: {}"
+        else
+          template+="\n    automated: \n      prune: \${{ inputs.autoPrune }}\n      selfHeal: \${{ inputs.selfHeal }}"
         fi
-
-        template+="\n"
-
-        # Define the output file path
-        output_file="${{ inputs.templatePath }}/${{ inputs.appName }}.yaml"
-
-        # Print the template to the output file
-        printf "%s" "${template}" > "${output_file}"
-
-        # Check if the file was successfully created
-        if [[ ! -f "${output_file}" ]]; then
-          echo "Error: Failed to create the file ${output_file}"
-          exit 1
-        fi
+        
+        echo "${template}" > ${{ inputs.templatePath }}/${{ inputs.appName }}.yaml
       shell: bash
