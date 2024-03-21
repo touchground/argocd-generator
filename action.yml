@@ -63,7 +63,7 @@ runs:
         fi
 
         # Append the application name
-        appName+="${{ inputs.appName }}"
+        appName+="${{ inputs.namespace }}-${{ inputs.appName }}"
 
         # Output the application name
         echo "name=$appName" >> $GITHUB_OUTPUT
