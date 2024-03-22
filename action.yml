@@ -13,10 +13,6 @@ inputs:
   namespace:
     description: 'Destination namespace'
     required: true
-  syncPolicy:
-    description: 'Sync policy'
-    required: false
-    default: 'automated'
   templatePath:
     description: 'Path to save the generated YAML file'
     required: false
@@ -41,6 +37,11 @@ inputs:
     description: 'Add environment prefix to add to the application name'
     required: false
     default: 'false'
+  envPostfix:
+        description: "The postfix for the environment variables"
+        required: false
+        type: string
+        default: "false"
 
 runs:
   using: 'composite'
@@ -49,21 +50,29 @@ runs:
       id: setAppName
       run: |
         # Initialize the application name
-        appName=""
+        appName=${{ inputs.appName }}
 
         # If envPrefix is set to true, prepend the environment name to the application name
         if [[ "${{ inputs.envPrefix }}" == "true" ]]; then
           # Check if environment name is not empty
           if [[ -n "${{ inputs.env }}" ]]; then
-            appName="${{ inputs.env }}-"
+            appName="${{ inputs.env }}-$appName"
           else
             echo "Error: Environment name is required when envPrefix is set to true"
             exit 1
           fi
         fi
 
-        # Append the application name
-        appName+="${{ inputs.appName }}"
+        # If envPostfix is set to true, append the environment name to the application name
+        if [[ "${{ inputs.envPostfix }}" == "true" ]]; then
+          # Check if environment name is not empty
+          if [[ -n "${{ inputs.env }}" ]]; then
+            appName="$appName.${{ inputs.env }}"
+          else
+            echo "Error: Environment name is required when envPostfix is set to true"
+            exit 1
+          fi
+        fi
 
         # Output the application name
         echo "name=$appName" >> $GITHUB_OUTPUT
@@ -75,7 +84,7 @@ runs:
         apiVersion: argoproj.io/v1alpha1
         kind: Application
         metadata:
-          name: ${{ steps.setAppName.outputs.name }}
+          name: ${{ steps.setAppName.outputs.name  }}
           namespace: argocd
           finalizers:
           - resources-finalizer.argocd.argoproj.io
