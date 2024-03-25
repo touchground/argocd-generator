@@ -100,10 +100,14 @@ runs:
           syncPolicy:'
 
         # Check if automated is set to true
-        if [[ "${{ inputs.automated }}" == "false" ]]; then
-          template+="\n    automated: {}"
+        if [[ "${{ inputs.automated }}" == "true" ]]; then
+          template+='
+            automated: {}'
         else
-          template+="\n    automated: \n      prune: \${{ inputs.autoPrune }}\n      selfHeal: \${{ inputs.selfHeal }}"
+          template+='
+            automated:
+              prune: ${{ inputs.autoPrune }}
+              selfHeal: ${{ inputs.selfHeal }}'
         fi
         
         echo "${template}" > ${{ inputs.templatePath }}/${{ inputs.appName }}.yaml
