@@ -102,9 +102,6 @@ runs:
         # Check if automated is set to true
         if [[ "${{ inputs.automated }}" == "true" ]]; then
           template+='
-            automated: {}'
-        else
-          template+='
             automated:
               prune: ${{ inputs.autoPrune }}
               selfHeal: ${{ inputs.selfHeal }}'
