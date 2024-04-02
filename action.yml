@@ -37,7 +37,7 @@ inputs:
     description: 'Add environment prefix to add to the application name'
     required: false
     default: 'false'
-  envPostfix:
+  envSuffix:
         description: "The postfix for the environment variables"
         required: false
         type: string
@@ -63,13 +63,13 @@ runs:
           fi
         fi
 
-        # If envPostfix is set to true, append the environment name to the application name
-        if [[ "${{ inputs.envPostfix }}" == "true" ]]; then
+        # If envSuffix is set to true, append the environment name to the application name
+        if [[ "${{ inputs.envSuffix }}" == "true" ]]; then
           # Check if environment name is not empty
           if [[ -n "${{ inputs.env }}" ]]; then
             appName="$appName.${{ inputs.env }}"
           else
-            echo "Error: Environment name is required when envPostfix is set to true"
+            echo "Error: Environment name is required when envSuffix is set to true"
             exit 1
           fi
         fi
