@@ -78,6 +78,11 @@ runs:
         echo "name=$appName" >> $GITHUB_OUTPUT
       shell: bash
 
+    - name: Create template directory
+      run: |
+        mkdir -p ${{ inputs.templatePath }}
+      shell: bash
+      
     - name: Generate ArgoCD Application
       run: |
         template='
