@@ -85,6 +85,7 @@ runs:
       
     - name: Generate ArgoCD Application
       run: |
+        set -e
         template='
         apiVersion: argoproj.io/v1alpha1
         kind: Application
@@ -102,7 +103,17 @@ runs:
           destination:
             server: {{ .Values.spec.destination.server }}
             namespace: ${{ inputs.namespace }}
-          syncPolicy:'
+          syncPolicy:
+            syncOptions:
+              - ApplyOutOfSyncOnly=true
+              - Replace=false
+              - SyncOptionSyncTimeout=1m
+            Retry:
+              limit: 2
+              backoff:
+                duration: 10s
+                factor: 2
+                maxDuration: 1m'
 
         # Check if automated is set to true
         if [[ "${{ inputs.automated }}" == "true" ]]; then
