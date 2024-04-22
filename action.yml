@@ -105,10 +105,10 @@ runs:
             namespace: ${{ inputs.namespace }}
           syncPolicy:
             syncOptions:
-              - ApplyOutOfSyncOnly=true
-              - Replace=false
+              - Replace=true
               - SyncOptionSyncTimeout=1m
-            Retry:
+              - SyncOptionApplyTimeout=1m
+            retry:
               limit: 2
               backoff:
                 duration: 10s
